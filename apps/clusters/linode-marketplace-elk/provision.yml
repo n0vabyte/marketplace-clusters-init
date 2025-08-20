@@ -2,13 +2,9 @@
 - name: Create ELK cluster
   hosts: localhost
   vars_files:
-      - group_vars/linode/vars
+    - group_vars/linode/vars
   
-  #vars:
-  #  count: '{{ cluster_size - 1 }}'
-
   tasks:
-
   # Create credentials
   - name: Generating test password
     blockinfile:
@@ -20,7 +16,7 @@
   # Create instances
   - name: Creating Elasticsearch servers
     linode.cloud.instance:
-      label: 'elasticsearch{{ item | int + 1 }}-{{ uuid }}'
+      label: 'elasticsearch{{ item }}-{{ uuid }}'
       api_token: '{{ token_password }}'
       type: '{{ elasticsearch_cluster_type }}'
       region: '{{ region }}'
@@ -37,9 +33,39 @@
   - name: Get info about Elasticsearch servers
     linode.cloud.instance_info:
       api_token: '{{ token_password }}'
-      label: '{{ instance_prefix }}{{ item }}-{{ uuid }}'
+      label: 'elasticsearch{{ item }}-{{ uuid }}'
     register: elasticsearch_info
     with_sequence: count='{{ elasticsearch_cluster_size }}'
+
+  - name: Creating Logstash servers
+    linode.cloud.instance:
+      label: 'logstash{{ item }}-{{ uuid }}'
+      api_token: '{{ token_password }}'
+      type: '{{ logstash_cluster_type }}'
+      region: '{{ region }}'
+      image: '{{ image }}'
+      root_pass: '{{ temp_root_pass }}'
+      authorized_keys: '{{ provisioner_ssh_pubkey }}'
+      private_ip: true
+      #stackscript_id: 00000
+      #ua_prefix: 'cloud-marketplace-elk'
+      tags: '{{ linode_tags }}'
+      state: present
+    with_sequence: count='{{ logstash_cluster_size }}'
+
+  - name: Get info about Logstash servers
+    linode.cloud.instance_info:
+      api_token: '{{ token_password }}'
+      label: 'logstash{{ item }}-{{ uuid }}'
+    register: logstash_info
+    with_sequence: count='{{ logstash_cluster_size }}'
+
+  - name: Get info about Kibana server
+    linode.cloud.instance_info:
+      api_token: '{{ token_password }}'
+      label: '{{ provisioner }}'
+    register: kibana_info
+    with_sequence: count='{{ kibana_cluster_size }}'
 
   - name: Update group_vars
     blockinfile:
@@ -50,12 +76,27 @@
         data:
           elasticsearch:
             {%- for count in range(elasticsearch_cluster_size) %}
-            - elasticsearch{{ count + 1 }}:
+            elasticsearch-{{ count + 1 }}:
               instance:
-                hostname: elasticsearch{{ count + 1 }}
+                hostname: elasticsearch-{{ count + 1 }}
                 ip_pub1: {{ elasticsearch_info.results[count].instance.ipv4[0] }}
                 ip_priv1: {{ elasticsearch_info.results[count].instance.ipv4[1] }}
             {%- endfor %}
+          logstash:
+            {%- for count in range(logstash_cluster_size) %}
+            logstash-{{ count + 1 }}:
+              instance:
+                hostname: logstash-{{ count + 1 }}
+                ip_pub1: {{ logstash_info.results[count].instance.ipv4[0] }}
+                ip_priv1: {{ logstash_info.results[count].instance.ipv4[1] }}
+            {%- endfor %}
+          kibana:
+            instance:
+              hostname: kibana
+              {%- for count in range(kibana_cluster_size) %}
+              ip_pub1: {{ kibana_info.results[count].instance.ipv4[0] }}
+              ip_priv1: {{ kibana_info.results[count].instance.ipv4[1] }}
+              {%- endfor %}
 
   - name: Add nodes to inventory
     blockinfile:
@@ -67,7 +108,19 @@
         localhost ansible_connection=local user=root
         [elasticsearch]
         {%- for count in range(elasticsearch_cluster_size) %}
-        {{ elasticsearch_info.results[count + 1].instance.ipv4[0] }}
+        {{ elasticsearch_info.results[count].instance.ipv4[0] }}
+        {%- endfor %}
+        [logstash]
+        {%- for count in range(logstash_cluster_size) %}
+        {{ logstash_info.results[count].instance.ipv4[0] }}
+        {%- endfor %}        
+        [elk]
+        localhost ansible_connection=local user=root
+        {%- for count in range(elasticsearch_cluster_size) %}
+        {{ elasticsearch_info.results[count].instance.ipv4[0] }}
+        {%- endfor %}
+        {%- for count in range(logstash_cluster_size) %}
+        {{ logstash_info.results[count].instance.ipv4[0] }}
         {%- endfor %}
 
   - name: Wait for port 22 to become open
@@ -77,4 +130,6 @@
       search_regex: OpenSSH
       delay: 10
     connection: local
-    with_items: "{{ elasticsearch_info.results }}"
+    with_items: 
+      - "{{ elasticsearch_info.results }}"
+      - "{{ logstash_info.results }}"

@@ -191,7 +191,7 @@ function provisioner_vars {
   uuid: ${UUID}
   token_password: ${TOKEN_PASSWORD}
   temp_root_pass: ${TEMP_ROOT_PASS}
-  root_pass: ${ROOT_PASS}
+  root_pass: "${ROOT_PASS}"
 EOF
 }
 
