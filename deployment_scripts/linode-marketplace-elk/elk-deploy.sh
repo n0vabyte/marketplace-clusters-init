@@ -198,7 +198,7 @@ EOF
 # UDF SETUP
 
 function udf {
-  sed 's/  //g' <<EOF > ${group_vars}
+  sed 's/  //g' <<EOF >> ${group_vars}
   # sudo username
   username: ${USER_NAME}
 EOF
@@ -224,8 +224,8 @@ EOF
   if [[ -n ${CLUSTER_SIZE} ]]; then
     echo "kibana_cluster_size: ${CLUSTER_SIZE}" >> ${group_vars}
   fi
-  if [[ -n ${ELASTICSEACH_CLUSTER_SIZE} ]]; then
-    echo "elasticsearch_cluster_size: ${ELASTICSEACH_CLUSTER_SIZE}" >> ${group_vars}
+  if [[ -n ${ELASTICSEARCH_CLUSTER_SIZE} ]]; then
+    echo "elasticsearch_cluster_size: ${ELASTICSEARCH_CLUSTER_SIZE}" >> ${group_vars}
   fi
   if [[ -n ${LOGSTASH_CLUSTER_SIZE} ]]; then
     echo "logstash_cluster_size: ${LOGSTASH_CLUSTER_SIZE}" >> ${group_vars}
