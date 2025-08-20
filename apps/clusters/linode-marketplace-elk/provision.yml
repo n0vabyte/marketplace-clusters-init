@@ -20,12 +20,12 @@
   # Create instances
   - name: Creating Elasticsearch servers
     linode.cloud.instance:
-      label: '{{ elasticsearch_prefix }}{{ item | int + 1 }}-{{ uuid }}'
+      label: 'elasticsearch{{ item | int + 1 }}-{{ uuid }}'
       api_token: '{{ token_password }}'
-      type: '{{ type }}'
+      type: '{{ elasticsearch_cluster_type }}'
       region: '{{ region }}'
       image: '{{ image }}'
-      root_pass: '{{ root_pass }}'
+      root_pass: '{{ temp_root_pass }}'
       authorized_keys: '{{ provisioner_ssh_pubkey }}'
       private_ip: true
       #stackscript_id: 00000
@@ -63,8 +63,9 @@
       marker: "# {mark} ELK CLUSTER"
       block: |
         #jinja2: trim_blocks:False
-        [elasticsearch]
+        [provisioner]
         localhost ansible_connection=local user=root
+        [elasticsearch]
         {%- for count in range(elasticsearch_cluster_size) %}
         {{ elasticsearch_info.results[count + 1].instance.ipv4[0] }}
         {%- endfor %}

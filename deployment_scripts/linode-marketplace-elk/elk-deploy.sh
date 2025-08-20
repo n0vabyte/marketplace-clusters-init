@@ -44,11 +44,11 @@ fi
 #<UDF name="cluster_size" label="Kinaba Size" oneOf="1,2" default="1">
 
 # Cluster size ($prefix_cluster_size):
-#<UDF name="elastic_cluster_size" label="Elasticsearch Cluster Size" oneOf="2,3" default="2">
+#<UDF name="elasticsearch_cluster_size" label="Elasticsearch Cluster Size" oneOf="2,3" default="2">
 #<UDF name="logstash_cluster_size" label="Logstash Cluster Size" oneOf="2,4" default="2">
 
 # Instance types($prefix_cluster_type):
-#<UDF name="elastic_cluster_type" label="Elasticsearch Instance Type" oneOf="Dedicated 4GB,Dedicated 8GB,Dedicated 16GB,Dedicated 32GB,Dedicated 64GB" default="Dedicated 4GB">
+#<UDF name="elasticsearch_cluster_type" label="Elasticsearch Instance Type" oneOf="Dedicated 4GB,Dedicated 8GB,Dedicated 16GB,Dedicated 32GB,Dedicated 64GB" default="Dedicated 4GB">
 #<UDF name="logstash_cluster_type" label="Logstash Instance Type" oneOf="Dedicated 4GB,Dedicated 8GB,Dedicated 16GB,Dedicated 32GB,Dedicated 64GB" default="Dedicated 4GB">
 
 # GIT REPO #
@@ -152,6 +152,7 @@ function rename_provisioner {
 # PROVISIONER SETUP
 
 readonly ROOT_PASS=$(sudo cat /etc/shadow | grep root)
+readonly TEMP_ROOT_PASS=$(openssl rand -base64 32)
 readonly LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .type,.region,.image))
 readonly TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
 #readonly VARS_PATH="./group_vars/linode/vars"
@@ -189,6 +190,8 @@ function provisioner_vars {
   linode_tags: ${TAGS}
   uuid: ${UUID}
   token_password: ${TOKEN_PASSWORD}
+  temp_root_pass: ${TEMP_ROOT_PASS}
+  root_pass: ${ROOT_PASS}
 EOF
 }
 
@@ -262,6 +265,7 @@ function run {
   configure_privateip
 
   # clone repo and set up Ansible environment
+  echo "[info] Cloning ${BRANCH} branch from ${GIT_REPO}..."
   git -C /tmp clone -b ${BRANCH} ${GIT_REPO}
   cd ${WORK_DIR}/${MARKETPLACE_APP}
   python3 -m venv env
