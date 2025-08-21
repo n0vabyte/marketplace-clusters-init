@@ -153,7 +153,7 @@ function rename_provisioner {
 
 readonly ROOT_PASS=$(sudo cat /etc/shadow | grep root)
 readonly TEMP_ROOT_PASS=$(openssl rand -base64 32)
-readonly LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .type,.region,.image))
+readonly LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .type,.region,.image,.disk_encryption))
 readonly TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
 #readonly VARS_PATH="./group_vars/linode/vars"
 readonly group_vars="${WORK_DIR}/${MARKETPLACE_APP}/group_vars/linode/vars"
@@ -161,7 +161,7 @@ readonly group_vars="${WORK_DIR}/${MARKETPLACE_APP}/group_vars/linode/vars"
 # destroys all instances except provisioner node
 function destroy {
   echo "[info] Destroying cluster nodes except provisioner..."
-  ansible-playbook destroy.yml
+  ansible-playbook -v destroy.yml
 }
 
 function provisioner_sshkey {
@@ -187,6 +187,7 @@ function provisioner_vars {
   type: ${LINODE_PARAMS[0]}
   region: ${LINODE_PARAMS[1]}
   image: ${LINODE_PARAMS[2]}
+  disk_encryption: ${LINODE_PARAMS[3]}
   linode_tags: ${TAGS}
   uuid: ${UUID}
   token_password: ${TOKEN_PASSWORD}

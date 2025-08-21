@@ -21,6 +21,7 @@
       type: '{{ elasticsearch_cluster_type }}'
       region: '{{ region }}'
       image: '{{ image }}'
+      disk_encryption: '{{ disk_encryption }}'
       root_pass: '{{ temp_root_pass }}'
       authorized_keys: '{{ provisioner_ssh_pubkey }}'
       private_ip: true
@@ -44,6 +45,7 @@
       type: '{{ logstash_cluster_type }}'
       region: '{{ region }}'
       image: '{{ image }}'
+      disk_encryption: '{{ disk_encryption }}'
       root_pass: '{{ temp_root_pass }}'
       authorized_keys: '{{ provisioner_ssh_pubkey }}'
       private_ip: true
@@ -81,6 +83,8 @@
                 hostname: elasticsearch-{{ count + 1 }}
                 ip_pub1: {{ elasticsearch_info.results[count].instance.ipv4[0] }}
                 ip_priv1: {{ elasticsearch_info.results[count].instance.ipv4[1] }}
+                memory: {{ elasticsearch_info.results[count].instance.specs.memory }}
+                vpus: {{ elasticsearch_info.results[count].instance.specs.vcpus }}
             {%- endfor %}
           logstash:
             {%- for count in range(logstash_cluster_size) %}
@@ -89,6 +93,8 @@
                 hostname: logstash-{{ count + 1 }}
                 ip_pub1: {{ logstash_info.results[count].instance.ipv4[0] }}
                 ip_priv1: {{ logstash_info.results[count].instance.ipv4[1] }}
+                memory: {{ logstash_info.results[count].instance.specs.memory }}
+                vpus: {{ logstash_info.results[count].instance.specs.vcpus }}
             {%- endfor %}
           kibana:
             instance:
@@ -96,6 +102,8 @@
               {%- for count in range(kibana_cluster_size) %}
               ip_pub1: {{ kibana_info.results[count].instance.ipv4[0] }}
               ip_priv1: {{ kibana_info.results[count].instance.ipv4[1] }}
+              memory: {{ kibana_info.results[count].instance.specs.memory }}
+              vpus: {{ kibana_info.results[count].instance.specs.vcpus }}
               {%- endfor %}
 
   - name: Add nodes to inventory
