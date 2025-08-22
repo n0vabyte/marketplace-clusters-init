@@ -1,0 +1,17 @@
+---
+# add keys when deployed with account keys
+- name: Checking account keys
+  stat:
+    path: '/root/.ssh/authorized_keys'
+  register: authorized_keys_file
+
+- name: Adding account keys to sudo user
+  copy:
+    src: '/root/.ssh/authorized_keys'
+    dest: '/home/{{ username }}/.ssh/authorized_keys'
+    mode: '0600'
+    owner: "{{ username }}"
+    group: "{{ username }}"
+  when:
+    - authorized_keys_file.stat.exists
+    - authorized_keys_file.stat.size > 0

@@ -174,14 +174,14 @@ function provisioner_sshkey {
   chmod 600 ${SSH_KEY_PATH}
   eval $(ssh-agent)
   ssh-add ${SSH_KEY_PATH}
-  echo -e "\nprivate_key_file = ${SSH_KEY_PATH}" >> ansible.cfg
+  echo -e "\nprivate_key_file = ${SSH_KEY_PATH}" >> ${WORK_DIR}/${MARKETPLACE_APP}/ansible.cfg
 }
 
 function provisioner_vars {
 # Adds variables to configure cluster instances.
   sed 's/  //g' <<EOF > ${group_vars}
   # provisioner vars
-  provisioner_ssh_pubkey: ${PROVISIONER_SSH_PUB_KEY}
+  provisioner_ssh_pubkey: "${PROVISIONER_SSH_PUB_KEY}"
   provisioner: ${INSTANCE_PREFIX}-${UUID}
   provisioner_prefix: ${INSTANCE_PREFIX}
   type: ${LINODE_PARAMS[0]}
@@ -205,19 +205,21 @@ function udf {
 EOF
 
   if [ "$DISABLE_ROOT" = "Yes" ]; then
-    echo "disable_root: yes" >> ${group_vars};
-  else echo "Leaving root login enabled";
+    echo "disable_root: yes" >> ${group_vars}
+  else 
+    echo "Leaving root login enabled"
   fi
 
   if [[ -n ${DOMAIN} ]]; then
-    echo "domain: ${DOMAIN}" >> ${group_vars};
+    echo "domain: ${DOMAIN}" >> ${group_vars}
   else
-    echo "default_dns: $(hostname -I | awk '{print $1}'| tr '.' '-' | awk {'print $1 ".ip.linodeusercontent.com"'})" >> ${group_vars};
+    echo "default_dns: $(hostname -I | awk '{print $1}'| tr '.' '-' | awk {'print $1 ".ip.linodeusercontent.com"'})" >> ${group_vars}
   fi
 
   if [[ -n ${SUBDOMAIN} ]]; then
-    echo "subdomain: ${SUBDOMAIN}" >> ${group_vars};
-  else echo "subdomain: www" >> ${group_vars};
+    echo "subdomain: ${SUBDOMAIN}" >> ${group_vars}
+  else 
+    echo "subdomain: www" >> ${group_vars}
   fi
 
   # ELK vars
@@ -276,6 +278,7 @@ function run {
   ansible-galaxy install -r collections.yml
 
   # populate group_vars
+  provisioner_sshkey
   provisioner_vars
   udf
   # run playbooks

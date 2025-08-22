@@ -1,0 +1,13 @@
+---
+- name: Configure ELK stack
+  hosts: elk
+  any_errors_fatal: true
+  user: root
+  vars_files:
+    - group_vars/linode/vars
+  roles:
+    - common
+    #- elasticsearch
+    #- kibana
+    #- logstash
+    - post

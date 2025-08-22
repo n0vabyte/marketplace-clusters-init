@@ -6,7 +6,7 @@
   
   tasks:
   # Create credentials
-  - name: Generating test password
+  - name: Generating sudo user password
     blockinfile:
       insertafter: EOF
       path: group_vars/linode/vars
@@ -78,9 +78,9 @@
         data:
           elasticsearch:
             {%- for count in range(elasticsearch_cluster_size) %}
-            elasticsearch-{{ count + 1 }}:
+            - elasticsearch-{{ count + 1 }}:
               instance:
-                hostname: elasticsearch-{{ count + 1 }}
+                hostname: elasticsearch-{{ count + 1 }}.local
                 ip_pub1: {{ elasticsearch_info.results[count].instance.ipv4[0] }}
                 ip_priv1: {{ elasticsearch_info.results[count].instance.ipv4[1] }}
                 memory: {{ elasticsearch_info.results[count].instance.specs.memory }}
@@ -88,9 +88,9 @@
             {%- endfor %}
           logstash:
             {%- for count in range(logstash_cluster_size) %}
-            logstash-{{ count + 1 }}:
+            - logstash-{{ count + 1 }}:
               instance:
-                hostname: logstash-{{ count + 1 }}
+                hostname: logstash-{{ count + 1 }}.local
                 ip_pub1: {{ logstash_info.results[count].instance.ipv4[0] }}
                 ip_priv1: {{ logstash_info.results[count].instance.ipv4[1] }}
                 memory: {{ logstash_info.results[count].instance.specs.memory }}
@@ -98,7 +98,7 @@
             {%- endfor %}
           kibana:
             instance:
-              hostname: kibana
+              hostname: kibana.local
               {%- for count in range(kibana_cluster_size) %}
               ip_pub1: {{ kibana_info.results[count].instance.ipv4[0] }}
               ip_priv1: {{ kibana_info.results[count].instance.ipv4[1] }}
