@@ -10,5 +10,5 @@
 - name: Enable UFW
   ufw:
     state: enabled
-  async: 60
-  poll: 0
+  #async: 60
+  #poll: 0
