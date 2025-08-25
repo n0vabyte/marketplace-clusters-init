@@ -282,7 +282,7 @@ function run {
   provisioner_vars
   udf
   # run playbooks
-  ansible-playbook -v provision.yml #&& ansible-playbook -v site.yml
+  ansible-playbook -v provision.yml && ansible-playbook -v -i hosts site.yml
 }
 
 # main

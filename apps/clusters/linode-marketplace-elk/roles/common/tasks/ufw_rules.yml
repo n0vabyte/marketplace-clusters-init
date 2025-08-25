@@ -11,3 +11,5 @@
   ufw:
     state: enabled
     policy: deny
+  async: 60
+  poll: 0
