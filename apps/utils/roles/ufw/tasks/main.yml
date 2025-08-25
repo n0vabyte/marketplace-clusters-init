@@ -7,6 +7,7 @@
 
 - name: UFW allow outgoing
   ufw:
+    state: enabled
     direction: outgoing
     policy: allow
 

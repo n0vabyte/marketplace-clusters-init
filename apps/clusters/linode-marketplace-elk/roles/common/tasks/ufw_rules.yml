@@ -9,6 +9,7 @@
 
 - name: Enable UFW
   ufw:
-    state: enabled
+    #state: enabled
+    state: reloaded
   #async: 60
   #poll: 0
