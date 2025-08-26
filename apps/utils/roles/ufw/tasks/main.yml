@@ -10,7 +10,7 @@
     direction: outgoing
     policy: allow
 
-- name: UFW deny incoming
-  ufw:
-    direction: incoming
-    policy: deny
+#- name: UFW deny incoming
+#  ufw:
+#    direction: incoming
+#    policy: deny
