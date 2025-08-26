@@ -21,6 +21,10 @@
   import_role: 
     name: sudouser
 
+- name: Set root password
+  import_role:
+    name: rootpasswd
+
 # Add ssh pub keys
 - name: Set SSH public key
   import_role:

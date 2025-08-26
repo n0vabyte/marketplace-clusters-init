@@ -38,13 +38,13 @@
   delegate_to: localhost      
   when: username in system_users
 
-# continue
-
 - name: Generating sudo user password
   set_fact:
     password: "{{ lookup('password', '/dev/null length=45 chars=ascii_letters,digits') }}"
     cacheable: yes
   no_log: true
+  run_once: true
+  delegate_to: localhost
 
 - name: Set sudo user
   user:

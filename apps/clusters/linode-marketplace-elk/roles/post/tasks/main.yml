@@ -1,4 +1,8 @@
 ---
+- name: Removing provsioner SSH keys
+  import_role:
+    name: remove_provision_keys
+
 - name: Set up MOTD
   template:
     src: templates/motd.j2

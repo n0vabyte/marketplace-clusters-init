@@ -51,6 +51,8 @@ fi
 #<UDF name="elasticsearch_cluster_type" label="Elasticsearch Instance Type" oneOf="Dedicated 4GB,Dedicated 8GB,Dedicated 16GB,Dedicated 32GB,Dedicated 64GB" default="Dedicated 4GB">
 #<UDF name="logstash_cluster_type" label="Logstash Instance Type" oneOf="Dedicated 4GB,Dedicated 8GB,Dedicated 16GB,Dedicated 32GB,Dedicated 64GB" default="Dedicated 4GB">
 
+#<UDF name="beats_allow" label="IP addresses allowed to access Logstash" example="192.0.2.21, 198.51.100.17" default="">
+
 # GIT REPO #
 
 #GH_USER=""
@@ -222,6 +224,11 @@ EOF
     echo "subdomain: www" >> ${group_vars}
   fi
 
+  if [[ -n ${DEBUG} ]]; then
+    echo "[info] debug ${DEBUG} passed"
+    echo "debug: ${DEBUG}" >> ${group_vars}
+  fi
+
   # ELK vars
 
   if [[ -n ${CLUSTER_SIZE} ]]; then
@@ -239,6 +246,12 @@ EOF
   if [[ -n ${LOGSTASH_CLUSTER_TYPE} ]]; then
     echo "logstash_cluster_type: ${LOGSTASH_CLUSTER_TYPE}" >> ${group_vars}
   fi      
+  if [[ -z ${BEATS_ALLOW} ]]; then
+    echo "[info] No IP addresses provided for beat"
+  else
+    echo "beats_allow: [${BEATS_ALLOW}]" >> ${group_vars}
+  fi
+
 
   # staging or production mode (ci)
   if [[ "${MODE}" == "staging" ]]; then

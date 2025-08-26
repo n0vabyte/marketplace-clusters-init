@@ -97,14 +97,16 @@
                 vpus: {{ logstash_info.results[count].instance.specs.vcpus }}
             {%- endfor %}
           kibana:
-            instance:
-              hostname: kibana.local
-              {%- for count in range(kibana_cluster_size) %}
-              ip_pub1: {{ kibana_info.results[count].instance.ipv4[0] }}
-              ip_priv1: {{ kibana_info.results[count].instance.ipv4[1] }}
-              memory: {{ kibana_info.results[count].instance.specs.memory }}
-              vpus: {{ kibana_info.results[count].instance.specs.vcpus }}
-              {%- endfor %}
+            {%- for count in range(cluster_size) %}
+            - kibana-{{ count + 1 }}:
+              instance:
+                hostname: kibana.local
+                {%- for count in range(kibana_cluster_size) %}
+                ip_pub1: {{ kibana_info.results[count].instance.ipv4[0] }}
+                ip_priv1: {{ kibana_info.results[count].instance.ipv4[1] }}
+                memory: {{ kibana_info.results[count].instance.specs.memory }}
+                vpus: {{ kibana_info.results[count].instance.specs.vcpus }}
+                {%- endfor %}
 
   - name: Add nodes to inventory
     blockinfile:
