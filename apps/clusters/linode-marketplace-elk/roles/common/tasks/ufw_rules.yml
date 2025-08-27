@@ -61,12 +61,12 @@
   delegate_to: "{{ item }}"
   loop: "{{ groups['logstash'] }}"
   when: beats_allow is defined
-
-#- name: UFW allow incoming
-#  ufw:
-#    direction: incoming
-#    policy: deny
     
 - name: Enable UFW
   ufw:
-    state: enabled  
+    state: enabled
+
+- name: UFW deny incoming
+  ufw:
+    direction: incoming
+    policy: deny
