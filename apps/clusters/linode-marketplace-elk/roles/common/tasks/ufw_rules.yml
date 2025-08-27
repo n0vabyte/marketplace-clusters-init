@@ -23,10 +23,6 @@
   loop:
     - "22"
 
-- name: Enable UFW
-  ufw:
-    state: enabled
-
 - name: Allow Kibana web access (public)
   ufw:
     rule: allow
@@ -65,3 +61,12 @@
   delegate_to: "{{ item }}"
   loop: "{{ groups['logstash'] }}"
   when: beats_allow is defined
+
+#- name: UFW allow incoming
+#  ufw:
+#    direction: incoming
+#    policy: deny
+    
+- name: Enable UFW
+  ufw:
+    state: enabled  
