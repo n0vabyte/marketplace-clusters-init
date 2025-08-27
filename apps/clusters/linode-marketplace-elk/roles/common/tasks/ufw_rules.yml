@@ -23,6 +23,10 @@
   loop:
     - "22"
 
+- name: Enable UFW
+  ufw:
+    state: enabled
+
 - name: Allow Kibana web access (public)
   ufw:
     rule: allow
@@ -35,7 +39,7 @@
     - "443"
 
 # Elasticsearch
-- name: Configure elasticsearch rules
+- name: Configure UFW for elasticsearch
   ufw:
     rule: allow
     port: "{{ item.1 }}"
@@ -61,7 +65,3 @@
   delegate_to: "{{ item }}"
   loop: "{{ groups['logstash'] }}"
   when: beats_allow is defined
-
-- name: Enable UFW
-  ufw:
-    state: enabled

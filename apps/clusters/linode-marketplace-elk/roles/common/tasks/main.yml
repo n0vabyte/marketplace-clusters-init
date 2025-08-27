@@ -23,7 +23,7 @@
 
 - name: Set root password
   import_role:
-    name: rootpasswd
+    name: setrootpwd
 
 # Add ssh pub keys
 - name: Set SSH public key
@@ -37,7 +37,7 @@
   when: disable_root is defined
 
 # Install UFW
-- name: Enabling ufw
+- name: Install UFW
   import_role:
     name: ufw
 

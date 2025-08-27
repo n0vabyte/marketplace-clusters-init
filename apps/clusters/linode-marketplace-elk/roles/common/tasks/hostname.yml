@@ -5,7 +5,9 @@
     marker: "# {mark} ELK STACK"
     block: |
       #jinja2: trim_blocks:False
-      {{ data.kibana.instance.ip_priv1 }} {{ data.kibana.instance.hostname }} kibana
+      {%- for count in range(kibana_cluster_size) %}
+      {{ data.kibana[count].instance.ip_priv1 }} {{ data.kibana[count].instance.hostname }} kibana-{{ count + 1 }}
+      {%- endfor %}
       {%- for count in range(elasticsearch_cluster_size) %}
       {{ data.elasticsearch[count].instance.ip_priv1 }} {{ data.elasticsearch[count].instance.hostname }} elasticsearch-{{ count + 1 }}
       {%- endfor %}
@@ -16,7 +18,7 @@
 - name: Configure hostnames for Kibana
   hostname:
     use: systemd
-    name: "{{ data.kibana.instance.hostname }}"
+    name: "{{ data.kibana[count].instance.hostname }}"
   run_once: true
   delegate_to: "{{ item }}"
   loop: "{{ groups['provisioner'] }}"

@@ -1,6 +1,7 @@
 ---
 - name: Create ELK cluster
   hosts: localhost
+  any_errors_fatal: true
   vars_files:
     - group_vars/linode/vars
   
@@ -97,16 +98,15 @@
                 vpus: {{ logstash_info.results[count].instance.specs.vcpus }}
             {%- endfor %}
           kibana:
-            {%- for count in range(cluster_size) %}
+            {%- for count in range(kibana_cluster_size) %}
             - kibana-{{ count + 1 }}:
               instance:
                 hostname: kibana.local
-                {%- for count in range(kibana_cluster_size) %}
                 ip_pub1: {{ kibana_info.results[count].instance.ipv4[0] }}
                 ip_priv1: {{ kibana_info.results[count].instance.ipv4[1] }}
                 memory: {{ kibana_info.results[count].instance.specs.memory }}
                 vpus: {{ kibana_info.results[count].instance.specs.vcpus }}
-                {%- endfor %}
+            {%- endfor %}
 
   - name: Add nodes to inventory
     blockinfile:
