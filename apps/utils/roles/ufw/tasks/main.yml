@@ -9,3 +9,8 @@
   ufw:
     direction: outgoing
     policy: allow
+
+- name: UFW allow incomming
+  ufw:
+    direction: incomming
+    policy: allow    
