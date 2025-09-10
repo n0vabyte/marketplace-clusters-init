@@ -7,7 +7,5 @@
     - group_vars/linode/vars
   roles:
     - common
-    #- elasticsearch
-    #- kibana
-    #- logstash
+    - elk
     - post

@@ -38,10 +38,10 @@ fi
 # ELK Settings #
 
 # Cluster name
-#<UDF name="cluster_name" label="Cluster Name">
+#<UDF name="cluster_name" label="Cluster Name" example="Example: ELK">
 
 # Kibana size
-#<UDF name="cluster_size" label="Kinaba Size" oneOf="1,2" default="1">
+#<UDF name="cluster_size" label="Kinaba Size" oneOf="1" default="1">
 
 # Cluster size ($prefix_cluster_size):
 #<UDF name="elasticsearch_cluster_size" label="Elasticsearch Cluster Size" oneOf="2,3" default="2">
@@ -52,6 +52,17 @@ fi
 #<UDF name="logstash_cluster_type" label="Logstash Instance Type" oneOf="Dedicated 4GB,Dedicated 8GB,Dedicated 16GB,Dedicated 32GB,Dedicated 64GB" default="Dedicated 4GB">
 
 #<UDF name="beats_allow" label="IP addresses allowed to access Logstash" example="192.0.2.21, 198.51.100.17" default="">
+
+# SSL vars
+#<UDF name="soa_email_address" label="Email address (for the Let's Encrypt SSL certificate)" example="Example: user@example.com">
+
+# <UDF name="sslheader" label="SSL Information" header="Yes" default="Yes" required="Yes">
+# <UDF name="country_name" label="Details for self-signed SSL certificates: Country or Region" oneof="AD,AE,AF,AG,AI,AL,AM,AO,AQ,AR,AS,AT,AU,AW,AX,AZ,BA,BB,BD,BE,BF,BG,BH,BI,BJ,BL,BM,BN,BO,BQ,BR,BS,BT,BV,BW,BY,BZ,CA,CC,CD,CF,CG,CH,CI,CK,CL,CM,CN,CO,CR,CU,CV,CW,CX,CY,CZ,DE,DJ,DK,DM,DO,DZ,EC,EE,EG,EH,ER,ES,ET,FI,FJ,FK,FM,FO,FR,GA,GB,GD,GE,GF,GG,GH,GI,GL,GM,GN,GP,GQ,GR,GS,GT,GU,GW,GY,HK,HM,HN,HR,HT,HU,ID,IE,IL,IM,IN,IO,IQ,IR,IS,IT,JE,JM,JO,JP,KE,KG,KH,KI,KM,KN,KP,KR,KW,KY,KZ,LA,LB,LC,LI,LK,LR,LS,LT,LU,LV,LY,MA,MC,MD,ME,MF,MG,MH,MK,ML,MM,MN,MO,MP,MQ,MR,MS,MT,MU,MV,MW,MX,MY,MZ,NA,NC,NE,NF,NG,NI,NL,NO,NP,NR,NU,NZ,OM,PA,PE,PF,PG,PH,PK,PL,PM,PN,PR,PS,PT,PW,PY,QA,RE,RO,RS,RU,RW,SA,SB,SC,SD,SE,SG,SH,SI,SJ,SK,SL,SM,SN,SO,SR,SS,ST,SV,SX,SY,SZ,TC,TD,TF,TG,TH,TJ,TK,TL,TM,TN,TO,TR,TT,TV,TW,TZ,UA,UG,UM,US,UY,UZ,VA,VC,VE,VG,VI,VN,VU,WF,WS,YE,YT,ZA,ZM,ZW" />
+# <UDF name="state_or_province_name" label="State or Province" example="Example: Pennsylvania" />
+# <UDF name="locality_name" label="Locality" example="Example: Philadelphia" />
+# <UDF name="organization_name" label="Organization" example="Example: Akamai Technologies" />
+# <UDF name="email_address" label="Email Address" example="Example: user@example.com" />
+# <UDF name="ca_common_name" label="CA Common Name" example="Example: Elasticsearch CA" />
 
 # GIT REPO #
 
@@ -153,7 +164,6 @@ function rename_provisioner {
 
 # PROVISIONER SETUP
 
-readonly ROOT_PASS=$(sudo cat /etc/shadow | grep root)
 readonly TEMP_ROOT_PASS=$(openssl rand -base64 32)
 readonly LINODE_PARAMS=($(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .type,.region,.image,.disk_encryption))
 readonly TAGS=$(curl -sH "Authorization: Bearer ${TOKEN_PASSWORD}" "https://api.linode.com/v4/linode/instances/${LINODE_ID}" | jq -r .tags)
@@ -194,7 +204,6 @@ function provisioner_vars {
   uuid: ${UUID}
   token_password: ${TOKEN_PASSWORD}
   temp_root_pass: ${TEMP_ROOT_PASS}
-  root_pass: "${ROOT_PASS}"
 EOF
 }
 
@@ -204,6 +213,17 @@ function udf {
   sed 's/  //g' <<EOF >> ${group_vars}
   # sudo username
   username: ${USER_NAME}
+
+  # SSL
+  country_name: ${COUNTRY_NAME}
+  state_or_province_name: ${STATE_OR_PROVINCE_NAME}
+  locality_name: ${LOCALITY_NAME}
+  organization_name: ${ORGANIZATION_NAME}
+  email_address: ${EMAIL_ADDRESS}
+  ca_common_name: ${CA_COMMON_NAME}
+
+  # Certbot
+  soa_email_address: ${SOA_EMAIL_ADDRESS}
 EOF
 
   if [ "$DISABLE_ROOT" = "Yes" ]; then
@@ -211,19 +231,16 @@ EOF
   else 
     echo "Leaving root login enabled"
   fi
-
   if [[ -n ${DOMAIN} ]]; then
     echo "domain: ${DOMAIN}" >> ${group_vars}
   else
     echo "default_dns: $(hostname -I | awk '{print $1}'| tr '.' '-' | awk {'print $1 ".ip.linodeusercontent.com"'})" >> ${group_vars}
   fi
-
   if [[ -n ${SUBDOMAIN} ]]; then
     echo "subdomain: ${SUBDOMAIN}" >> ${group_vars}
   else 
     echo "subdomain: www" >> ${group_vars}
   fi
-
   if [[ -n ${DEBUG} ]]; then
     echo "[info] debug ${DEBUG} passed"
     echo "debug: ${DEBUG}" >> ${group_vars}
@@ -231,6 +248,9 @@ EOF
 
   # ELK vars
 
+  if [[ -n ${CLUSTER_NAME} ]]; then
+    echo "cluster_name: ${CLUSTER_NAME}" >> ${group_vars}
+  fi
   if [[ -n ${CLUSTER_SIZE} ]]; then
     echo "kibana_cluster_size: ${CLUSTER_SIZE}" >> ${group_vars}
   fi
@@ -251,7 +271,6 @@ EOF
   else
     echo "beats_allow: [${BEATS_ALLOW}]" >> ${group_vars}
   fi
-
 
   # staging or production mode (ci)
   if [[ "${MODE}" == "staging" ]]; then
@@ -296,8 +315,8 @@ function run {
   udf
   # run playbooks
   ansible-playbook -v provision.yml && ansible-playbook -v -i hosts site.yml
+  installation_complete
 }
 
 # main
 run
-installation_complete

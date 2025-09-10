@@ -1,5 +1,4 @@
 ---
-
 # Update system
 - name: Update system packages
   import_role:
@@ -14,7 +13,7 @@
   import_role:
     name: setdomain
   run_once: true
-  delegate_to: "localhost"
+  delegate_to: localhost
 
 # Add limited sudo user
 - name: Create sudo user

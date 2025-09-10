@@ -1,0 +1,75 @@
+---
+- name: Create Logstash ILM policy
+  uri:
+    url: "{{ elasticsearch_endpoint }}/_ilm/policy/wordpress-logs-policy"
+    user: elastic
+    password: "{{ elastic_password }}"
+    method: PUT
+    body_format: json
+    status_code: [200]
+    return_content: true
+    ca_path: "{{ elasticsearch_ssl_directory }}/ca.crt"
+    client_cert: "{{ elasticsearch_ssl_directory }}/{{ data.elasticsearch[0].instance.hostname }}.crt"
+    client_key: "{{ elasticsearch_ssl_directory }}/{{ data.elasticsearch[0].instance.hostname }}.key"
+    body:
+      policy: { 
+        phases: {
+          hot: {
+            actions: {
+              rollover: {
+                max_size: "50gb",
+                max_age: "7d"
+                }
+              }
+            },
+          delete: { 
+            min_age: "30d", 
+            actions: { 
+              delete: {} 
+              } 
+            }          
+          }
+        }
+    headers:
+      Content-Type: 'application/json'
+  run_once: true
+  delegate_to: "{{ groups['elasticsearch'][0] }}"
+
+- name: Create Logstash index template
+  uri:
+    url: "{{ elasticsearch_endpoint }}/_index_template/wordpress-logs-template"
+    user: elastic
+    password: "{{ elastic_password }}"
+    method: PUT
+    body_format: json
+    status_code: [200]
+    return_content: true
+    ca_path: "{{ elasticsearch_ssl_directory }}/ca.crt"
+    client_cert: "{{ elasticsearch_ssl_directory }}/{{ data.elasticsearch[0].instance.hostname }}.crt"
+    client_key: "{{ elasticsearch_ssl_directory }}/{{ data.elasticsearch[0].instance.hostname }}.key"
+    body:
+      index_patterns: ["wordpress-logs-*"]
+      priority: 300
+      template: {
+        mappings: {
+          properties: {
+            order_date: {
+              type: "date",
+              format: "dd-MM-yyyy"
+              }
+            }
+          },
+        settings: {
+          index.lifecycle.name: "wordpress-logs-policy",
+          index.lifecycle.rollover_alias: "wordpress-template",
+          number_of_shards: 3,
+          number_of_replicas: 1
+          },
+        aliases: {
+          wordpress-template: {}
+          }                    
+        }
+    headers:
+      Content-Type: 'application/json'
+  run_once: true
+  delegate_to: "{{ groups['elasticsearch'][0] }}"

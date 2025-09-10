@@ -7,12 +7,13 @@
   
   tasks:
   # Create credentials
-  - name: Generating sudo user password
+  - name: Generating cluster passwords
     blockinfile:
       insertafter: EOF
+      marker: "# {mark} ELK CREDS"
       path: group_vars/linode/vars
       block: |
-        test_password: {{ lookup('password', '/dev/null length=45 chars=ascii_letters,digits') }}
+        logstash_ingest_password: {{ lookup('password', '/dev/null length=45 chars=ascii_letters,digits') }}
 
   # Create instances
   - name: Creating Elasticsearch servers
