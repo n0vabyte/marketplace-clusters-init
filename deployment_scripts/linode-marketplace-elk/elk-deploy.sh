@@ -105,15 +105,18 @@ function provision_failed {
 }
 
 function cleanup {
-  if [ -d "${WORK_DIR}" ]; then
-    rm -rf ${WORK_DIR}
-  fi
-
   # provisioner keys
   if [ -f "${HOME}/.ssh/id_ansible_ed25519{,.pub}" ]; then
     echo "[info] Removing provisioner keys.."
     rm ${HOME}/.ssh/id_ansible_ed25519{,.pub}
-    destroy
+  fi
+
+  echo "[info] Running Destroy playbook"
+  destroy
+
+  if [ -d "${WORK_DIR}" ]; then
+    echo "[info] Cleanup - Removing ${WORK_DIR}"
+    rm -rf ${WORK_DIR}
   fi
 }
 
@@ -172,6 +175,8 @@ readonly group_vars="${WORK_DIR}/${MARKETPLACE_APP}/group_vars/linode/vars"
 
 # destroys all instances except provisioner node
 function destroy {
+  cd ${WORK_DIR}/${MARKETPLACE_APP}
+  source env/bin/activate  
   echo "[info] Destroying cluster nodes except provisioner..."
   ansible-playbook -v destroy.yml
 }
