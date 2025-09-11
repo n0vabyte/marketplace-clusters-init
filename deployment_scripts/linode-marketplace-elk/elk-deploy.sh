@@ -320,8 +320,8 @@ function run {
   udf
   # run playbooks
   ansible-playbook -v provision.yml && ansible-playbook -v -i hosts site.yml
-  installation_complete
 }
 
 # main
 run
+installation_complete

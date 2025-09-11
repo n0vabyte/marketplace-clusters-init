@@ -43,7 +43,7 @@ server.host: "localhost"
 #elasticsearch.hosts: ["http://localhost:9200"]
 elasticsearch.hosts: {% set hosts = [] %}
     {%- for i in range(elasticsearch_cluster_size) -%}
-    {{ hosts.append(data.elasticsearch[i].instance.hostname + ":9200") }}
+    {{ hosts.append("https://" + data.elasticsearch[i].instance.hostname + ":9200") }}
     {%- endfor -%} {{ hosts}}
 
 # If your Elasticsearch is protected with basic authentication, these settings provide

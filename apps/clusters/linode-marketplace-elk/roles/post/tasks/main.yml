@@ -17,3 +17,10 @@
     content: |
       Sudo Username: {{ username }}
       Sudo Password: {{ password }}
+
+      # ELK creds
+      Elastic password: {{ elastic_password }}
+      Kibana system password: {{ kibana_system_password }}
+      Logstash system password: {{ logstash_system_password }}
+      Beats system password: {{ beats_system_password }}
+

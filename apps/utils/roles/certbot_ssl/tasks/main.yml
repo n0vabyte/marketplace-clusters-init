@@ -2,7 +2,7 @@
 
 # Helper: certbot_ssl
 #
-# Allows us to configure SSL for a web endpoint in
+# Allows us to configure SSL for a web HTTP endpoint in
 # a clustered environment.
 #
 # When using this helper the task, must include 
