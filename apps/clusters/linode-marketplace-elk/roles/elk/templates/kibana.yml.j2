@@ -41,10 +41,10 @@ server.host: "localhost"
 # =================== System: Elasticsearch ===================
 # The URLs of the Elasticsearch instances to use for all your queries.
 #elasticsearch.hosts: ["http://localhost:9200"]
-elasticsearch.hosts:
-{%- for i in range(elasticsearch_cluster_size) -%}
-  - "https://{{ data.elasticsearch[i].instance.hostname }}:9200"
-{%- endfor -%}
+elasticsearch.hosts: {% set hosts = [] %}
+    {%- for i in range(elasticsearch_cluster_size) -%}
+    {{ hosts.append(data.elasticsearch[i].instance.hostname + ":9200") }}
+    {%- endfor -%} {{ hosts}}
 
 # If your Elasticsearch is protected with basic authentication, these settings provide
 # the username and password that the Kibana server uses to perform maintenance on the Kibana

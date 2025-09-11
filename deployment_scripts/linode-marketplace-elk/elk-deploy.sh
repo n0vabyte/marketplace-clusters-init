@@ -106,7 +106,7 @@ function provision_failed {
 
 function cleanup {
   # provisioner keys
-  if [ -f "${HOME}/.ssh/id_ansible_ed25519{,.pub}" ]; then
+  if [ -f ${HOME}/.ssh/id_ansible_ed25519{,.pub} ]; then
     echo "[info] Removing provisioner keys.."
     rm ${HOME}/.ssh/id_ansible_ed25519{,.pub}
   fi
