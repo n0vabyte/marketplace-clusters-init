@@ -51,7 +51,7 @@ fi
 #<UDF name="elasticsearch_cluster_type" label="Elasticsearch Instance Type" oneOf="Dedicated 4GB,Dedicated 8GB,Dedicated 16GB,Dedicated 32GB,Dedicated 64GB" default="Dedicated 4GB">
 #<UDF name="logstash_cluster_type" label="Logstash Instance Type" oneOf="Dedicated 4GB,Dedicated 8GB,Dedicated 16GB,Dedicated 32GB,Dedicated 64GB" default="Dedicated 4GB">
 
-#<UDF name="beats_allow" label="IP addresses allowed to access Logstash" example="192.0.2.21, 198.51.100.17" default="">
+#<UDF name="beats_allow" label="Filebeat IP addresses allowed to access Logstash" example="192.0.2.21, 198.51.100.17" default="">
 
 # SSL vars
 #<UDF name="soa_email_address" label="Email address (for the Let's Encrypt SSL certificate)" example="Example: user@example.com">

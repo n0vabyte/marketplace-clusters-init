@@ -20,6 +20,7 @@ output {
     {%- for i in range(elasticsearch_cluster_size) -%}
     {{ hosts.append(data.elasticsearch[i].instance.hostname + ":9200") }}
     {%- endfor -%} {{ hosts}}
+    index => "wordpress-logs"
     user => "logstash_ingest"
     password => "{{ logstash_ingest_password }}"
     ssl_enabled => true
