@@ -53,6 +53,11 @@ fi
 
 #<UDF name="beats_allow" label="Filebeat IP addresses allowed to access Logstash" example="192.0.2.21, 198.51.100.17" default="">
 
+#<UDF name="logstash_ingest_username" label="Logstash username to be created for indeces." example="logstash_ingest" default="logstash_ingest">
+
+#<UDF name="elasticsearch_index_name" label="Elasticsearch index to be created for log ingestion" example="wordpress-logs" default="wordpress-logs">
+
+
 # SSL vars
 #<UDF name="soa_email_address" label="Email address (for the Let's Encrypt SSL certificate)" example="Example: user@example.com">
 
@@ -275,6 +280,12 @@ EOF
     echo "[info] No IP addresses provided for beat"
   else
     echo "beats_allow: [${BEATS_ALLOW}]" >> ${group_vars}
+  fi
+  if [[ -n ${LOGSTASH_INGEST_USERNAME} ]]; then
+    echo "logstash_ingest_username: ${LOGSTASH_INGEST_USERNAME}" >> ${group_vars}
+  fi
+  if [[ -n ${ELASTICSEARCH_INDEX_NAME} ]]; then
+    echo "elasticsearch_index_name: ${ELASTICSEARCH_INDEX_NAME}" >> ${group_vars}
   fi
 
   # staging or production mode (ci)

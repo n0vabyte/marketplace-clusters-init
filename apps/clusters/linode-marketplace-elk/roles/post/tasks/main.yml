@@ -19,8 +19,7 @@
       Sudo Password: {{ password }}
 
       # ELK creds
-      Elastic password: {{ elastic_password }}
+      Elastic password: {{ elasticsearch_password }}
       Kibana system password: {{ kibana_system_password }}
-      Logstash system password: {{ logstash_system_password }}
-      Beats system password: {{ beats_system_password }}
-
+      Logstash ingest user: {{ logstash_ingest_username }}
+      Logstash ingest password: {{ logstash_ingest_password}}

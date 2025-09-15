@@ -12,7 +12,7 @@
   uri:
     url: "{{ elasticsearch_endpoint }}/_security/role/logstash_writer"
     user: elastic
-    password: "{{ elastic_password }}"
+    password: "{{ elasticsearch_password }}"
     method: POST
     body_format: json
     status_code: [200]
@@ -33,7 +33,7 @@
   uri:
     url: "{{ elasticsearch_endpoint }}/_security/user/logstash_ingest"
     user: elastic
-    password: "{{ elastic_password }}"
+    password: "{{ elasticsearch_password }}"
     method: POST
     body_format: json
     status_code: [200]
