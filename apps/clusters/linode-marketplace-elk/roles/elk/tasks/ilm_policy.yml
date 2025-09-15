@@ -65,9 +65,7 @@
           number_of_shards: 3,
           number_of_replicas: 1
           },
-        aliases: {
-          "{{ elasticsearch_index_name }}-template": {}
-          }                    
+        aliases: "{{ { (elasticsearch_index_name ~ '-template'): {} } }}"
         }
     headers:
       Content-Type: 'application/json'
