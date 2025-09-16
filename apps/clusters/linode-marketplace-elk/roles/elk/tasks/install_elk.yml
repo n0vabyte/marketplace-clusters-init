@@ -8,7 +8,7 @@
   delegate_to: "{{ item }}"
   loop: "{{ groups['elasticsearch'] }}"
 
-- name: Installing Logstsh
+- name: Installing Logstash
   apt:
     name: logstash
     state: present

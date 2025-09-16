@@ -3,6 +3,17 @@
   import_role:
     name: remove_provision_keys
 
+- name: Adding account keys to root user
+  copy:
+    src: '{{ authorized_keys_file.stat.path }}'
+    dest: '/root/.ssh/authorized_keys'
+    mode: '0600'
+    owner: "root"
+    group: "root"
+  when:
+    - authorized_keys_file.stat.exists
+    - authorized_keys_file.stat.size > 0    
+
 - name: Set up MOTD
   template:
     src: templates/motd.j2
