@@ -25,7 +25,7 @@
     name: setrootpwd
 
 # Add ssh pub keys
-- name: Set SSH public key
+- name: Add SSH public keys
   import_role:
     name: sshkey
 
