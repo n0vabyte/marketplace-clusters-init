@@ -1,6 +1,6 @@
 # Akamai Cloud ELK One-Click Cluster
 
-** diagram
+![elasticstack-overview](docs/assets/elaticstack-overview.png)
 
 Deploy a fully configured, multi-node ELK (Elasticsearch, Logstash, Kibana) cluster on the Akamai Cloud using our One-Click deployement. Our ELK stack leverages mTLS certificates to secure communication between nodes, ensuring data integrity and privacy across the cluster.
 
