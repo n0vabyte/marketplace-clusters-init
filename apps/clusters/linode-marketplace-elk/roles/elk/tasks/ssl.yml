@@ -50,7 +50,7 @@
     owner: root
     group: root
     mode: 0600
-  #no_log: true
+  no_log: true
   register: ca_key
   run_once: true
   delegate_to: localhost
@@ -102,6 +102,7 @@
     group: root
     mode: '0600'
     return_content: true
+  no_log: true
   run_once: true
   delegate_to: localhost
   loop: "{{ data.elasticsearch }}"
@@ -115,6 +116,7 @@
     group: root
     mode: '0600'
     return_content: true
+  no_log: true
   run_once: true
   delegate_to: localhost
   loop: "{{ data.logstash }}"
@@ -128,6 +130,7 @@
     group: root
     mode: '0600'
     return_content: true
+  no_log: true
   run_once: true
   delegate_to: localhost
   loop: "{{ data.kibana }}"

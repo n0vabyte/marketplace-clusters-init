@@ -1,30 +1,19 @@
 ---
+# Removes provisioner artifacts and adds account keys
 - name: Removing provsioner SSH keys
   import_role:
     name: remove_provision_keys
 
-# Add ssh pub keys
 - name: Add SSH public keys
   import_role:
     name: sshkey
 
-# Secure ssh auth
 - name: Disable root login
   import_role: 
     name: securessh
   when: disable_root is defined
 
-#- name: Adding account keys to root user
-#  copy:
-#    src: '{{ authorized_keys_file.stat.path }}'
-#    dest: '/root/.ssh/authorized_keys'
-#    mode: '0600'
-#    owner: "root"
-#    group: "root"
-#  when:
-#    - authorized_keys_file.stat.exists
-#    - authorized_keys_file.stat.size > 0
-
+# Set login MOTD and write deploy creds
 - name: Set up MOTD
   template:
     src: templates/motd.j2

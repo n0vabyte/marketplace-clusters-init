@@ -34,7 +34,6 @@
   loop_control:
     index_var: count
 
-
 # Convert certificate to pem encoded
 
 - name: Convert private key to PKCS8 format

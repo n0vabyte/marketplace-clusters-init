@@ -15,6 +15,7 @@
   shell:
     cmd: |
       /usr/share/kibana/bin/kibana-encryption-keys generate
+  no_log: true
   run_once: true
   delegate_to: localhost
   register: kibana_encryption_keys

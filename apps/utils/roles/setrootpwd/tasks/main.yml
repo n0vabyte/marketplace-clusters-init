@@ -4,11 +4,13 @@
     src: "/etc/shadow"
   run_once: true
   delegate_to: localhost
+  no_log: true
   register: shadow
 
 - name: Set root password
   set_fact:
     root_password: "{{ shadow['content'] | b64decode | regex_search('^root.+') }}"
+  no_log: true
   run_once: true
   delegate_to: localhost
 
