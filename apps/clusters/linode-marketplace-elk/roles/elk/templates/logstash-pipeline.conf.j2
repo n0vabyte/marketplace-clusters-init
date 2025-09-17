@@ -1,0 +1,31 @@
+# Example Logstash configuration
+# Beats => Logstash => Elasticsearch pipeline.
+
+input {
+  beats {
+    id => "beats_input_ssl"
+    port => 5044
+    ssl_enabled => true
+    ssl_certificate => "{{ logstash_ssl_directory }}/{{ data.logstash[count].instance.hostname}}.crt"
+    ssl_key => "{{ logstash_ssl_directory}}/{{ data.logstash[count].instance.hostname}}.pkcs8.key"
+    ssl_client_authentication => "optional"
+    ssl_certificate_authorities => ["{{ logstash_ssl_directory }}/ca.crt"]
+  }
+}
+
+output {
+  elasticsearch {
+    id => "elasticsearch_outout_logs"
+    hosts => {% set hosts = [] %}
+    {%- for i in range(elasticsearch_cluster_size) -%}
+    {{ hosts.append(data.elasticsearch[i].instance.hostname + ":9200") }}
+    {%- endfor -%} {{ hosts}}
+    index => "{{ elasticsearch_index_name }}"
+    user => "{{ logstash_ingest_username }}"
+    password => "{{ logstash_ingest_password }}"
+    ssl_enabled => true
+    ssl_certificate => "{{ logstash_ssl_directory}}/{{ data.logstash[count].instance.hostname}}.crt"
+    ssl_key => "{{ logstash_ssl_directory}}/{{ data.logstash[count].instance.hostname}}.pkcs8.key"
+    ssl_certificate_authorities => ["{{ logstash_ssl_directory }}/ca.crt"]
+  }
+}
