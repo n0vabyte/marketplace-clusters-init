@@ -24,16 +24,16 @@
   import_role:
     name: setrootpwd
 
-# Add ssh pub keys
-- name: Add SSH public keys
-  import_role:
-    name: sshkey
-
-# Secure ssh auth
-- name: Disable root login
-  import_role: 
-    name: securessh
-  when: disable_root is defined
+## Add ssh pub keys
+#- name: Add SSH public keys
+#  import_role:
+#    name: sshkey
+#
+## Secure ssh auth
+#- name: Disable root login
+#  import_role: 
+#    name: securessh
+#  when: disable_root is defined
 
 # Install UFW
 - name: Install UFW
